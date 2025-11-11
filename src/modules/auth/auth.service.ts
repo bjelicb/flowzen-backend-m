@@ -32,26 +32,44 @@ export class AuthService {
 
     async login(user: any) {
         const roleId = user.role?._id || user.role;
-        const scopes = user.role?.availableScopes.map((scope) => scope.name) || [];
+        const roleScopes = user.role?.availableScopes?.map((scope) => scope.name) || [];
+        const userScopes = Array.isArray(user.scopes) && user.scopes.length > 0 ? user.scopes : roleScopes;
+        const tenantRecord = user.tenant && typeof user.tenant === 'object' ? user.tenant : null;
+        const tenantId = tenantRecord?._id || user.tenant || null;
+
+        const tenantInfo = tenantRecord
+            ? {
+                tenantId: tenantRecord._id?.toString() ?? null,
+                name: tenantRecord.name,
+                status: tenantRecord.status,
+                hasActiveLicense: tenantRecord.hasActiveLicense,
+                licenseStartDate: tenantRecord.licenseStartDate ?? null,
+                licenseExpiryDate: tenantRecord.licenseExpiryDate ?? null,
+                suspendedAt: tenantRecord.suspendedAt ?? null,
+                suspensionReason: tenantRecord.suspensionReason ?? null,
+            }
+            : null;
 
         const payload = {
             username: user.name,
             sub: user._id,
             role: roleId,
-            scopes,
-            tenant: user.tenant._id
+            scopes: userScopes,
+            tenant: tenantId,
+            isGlobalAdmin: !!user.isGlobalAdmin
         };
   
         return {
             access_token: this.jwtService.sign(payload),
             user: {
                 userId: user._id,
-                tenant: user.tenant._id,
+                tenant: tenantInfo ?? tenantId,
                 email: user.email,
                 username: user.email,
                 name: user.name,
                 role: roleId,
-                scopes: scopes
+                scopes: userScopes,
+                isGlobalAdmin: !!user.isGlobalAdmin
             }
         };
     }

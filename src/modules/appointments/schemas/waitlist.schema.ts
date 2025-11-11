@@ -27,7 +27,7 @@ import { Facility } from 'src/modules/facility/schema/facility.schema';
     toJSON: { virtuals: true, versionKey: false, transform: docToJsonTransform },
 })
 export class WaitlistEntry {
-  _id?: MongooseSchema.Types.ObjectId;
+    _id?: MongooseSchema.Types.ObjectId;
 
   @Prop({
       type: MongooseSchema.Types.ObjectId,
@@ -109,7 +109,7 @@ export class WaitlistEntry {
    * Generiše se kada se termin oslobodi (notifyWaitlistForAvailableSlot).
    * Koristi se u claimAppointmentFromWaitlist() metodi.
    */
-  @Prop({ type: String, default: null })
+  @Prop({ type: String, default: undefined })
       claimToken: string;
 
   /**
@@ -117,7 +117,7 @@ export class WaitlistEntry {
    * Token je validan 24 sata od trenutka slanja notifikacije.
    * Nakon isteka, klijent ne može više da prihvati termin sa tim tokenom.
    */
-  @Prop({ type: Date, default: null })
+  @Prop({ type: Date, default: undefined })
       claimTokenExpiresAt: Date;
 
   readonly createdAt?: Date;
